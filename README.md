@@ -93,7 +93,7 @@ The apiName is usually printed in error messages when you miss a certain API Key
 
 Now you are ready to go, start the server with:
 
-	python SiriServer.py -p 443
+	python SiriServer.py
 	
 You don't need to run it as root, as we use https port 4443.
 If you want to use another port use:
