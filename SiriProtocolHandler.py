@@ -68,7 +68,10 @@ class SiriProtocolHandler(Siri):
             self.logger.info("Connection timed out")
             self.transport.loseConnection() 
         else:
-            self.timeoutschedule.reset(SiriProtocolHandler.__scheduling_interval_timeout__)  
+            try:
+                self.timeoutschedule.reset(SiriProtocolHandler.__scheduling_interval_timeout__)  
+            except:
+                self.logger.info("Schedule Connection has Timed out")
     
     def handle_google_data(self, body, requestId, dictation):
         self.current_google_request = None
