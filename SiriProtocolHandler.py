@@ -32,7 +32,7 @@ class SiriProtocolHandler(Siri):
     __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}", "fr-FR": u"Désolé je ne comprends pas ce que \"{0}\" veut dire."}
     __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch", "fr-FR": u"Rechercher sur le Web"}
     __scheduling_interval_timeout__ = 20
-    __timeout_delay = 10
+    __timeout_delay = 30
     
     def __init__(self, server, peer):
         Siri.__init__(self, server, peer)
