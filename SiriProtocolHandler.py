@@ -22,7 +22,10 @@ import sqlite3
 import time
 import uuid
 import twisted
+import sys
 
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
        
 
 class SiriProtocolHandler(Siri):
@@ -270,7 +273,7 @@ class SiriProtocolHandler(Siri):
                     objProperties = plist['properties'] 
                     self.assistant.censorSpeech = objProperties['censorSpeech']
                     self.assistant.timeZoneId = objProperties['timeZoneId']
-                    self.assistant.language = objProperties['language']
+                    self.assistant.language = objProperties['language']                    
                     self.assistant.region = objProperties['region']
                     #Record the user firstName and nickName                    
                     try:                        
