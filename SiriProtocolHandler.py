@@ -289,6 +289,11 @@ class SiriProtocolHandler(Siri):
                     self.assistant.timeZoneId = objProperties['timeZoneId']
                     self.assistant.language = objProperties['language']
                     self.assistant.region = objProperties['region']
+                    #Here it is possible to support more languages combined with anyvoice package
+                    #We can make assumption that the region will define the language. 
+                    #Chinese Example
+                    if self.assistant.region=="zh-CN":
+                        self.assistant.language = "zh-CN"
                     #Record the user firstName and nickName                    
                     try:                        
                         self.assistant.firstName = objProperties["meCards"][0]["properties"]["firstName"].encode("utf-8")
