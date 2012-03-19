@@ -22,12 +22,12 @@ import sqlite3
 import time
 import uuid
 import twisted
-
+import config
        
 
 class SiriProtocolHandler(Siri):
-    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}", "fr-FR": u"Désolé je ne comprends pas ce que \"{0}\" veut dire."}
-    __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch", "fr-FR": u"Rechercher sur le Web"}
+    __not_recognized =  {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry, I don't understand ‘{0}’.", "fr-FR": u"Désolé je ne comprends pas ce que \"{0}\" veut dire.", "zh-CN": u"对不起，我不知道“{0}”是什么意思。"}
+    __websearch =  {"de-DE": u"Websuche", "en-US": u"Search the web", "fr-FR": u"Rechercher sur le Web", "zh-CN": u"搜索网页"}    
     __scheduling_interval_timeout__ = 20
     __timeout_delay = 10
     
@@ -290,10 +290,13 @@ class SiriProtocolHandler(Siri):
                     self.assistant.language = objProperties['language']
                     self.assistant.region = objProperties['region']
                     #Here it is possible to support more languages combined with anyvoice package
-                    #We can make assumption that the region will define the language. 
-                    #Chinese Example
-                    if self.assistant.region=="zh-CN":
-                        self.assistant.language = "zh-CN"
+                    #We can make assumption that the region will define the language.                     
+                    if config.forcelanguage==True:                   
+                        #Chinese Example
+                        if self.assistant.region=="zh-CN":
+                            self.assistant.language = "zh-CN"                        
+                            self.logger.debug("Forced language to {0}".format(self.assistant.language))
+                            
                     #Record the user firstName and nickName                    
                     try:                        
                         self.assistant.firstName = objProperties["meCards"][0]["properties"]["firstName"].encode("utf-8")
@@ -309,7 +312,7 @@ class SiriProtocolHandler(Siri):
                     c.close()
                 except:
                     self.send_plist({"class":"CommandFailed", "properties": {"reason":"Database error", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": plist['aceId'], "group":"com.apple.ace.system"})
-                    self.logger.error("Database Error on setting assistant data")
+                    self.logger.error("Error on setting assistant data")
             else:
                 self.send_plist({"class":"CommandFailed", "properties": {"reason":"Assistant to set data not found", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": plist['aceId'], "group":"com.apple.ace.system"})
                 self.logger.warning("Trying to set assistant data without having a valid assistant")
