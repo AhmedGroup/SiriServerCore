@@ -13,11 +13,13 @@ except ImportError:
     exit(-1)
     
 from SiriProtocolHandler import SiriProtocolHandler
-from optparse import OptionParser
+#switched to argparse due to optionparser is a  depriciated module and connot handle empty argument values
+import argparse
 from os.path import exists
 from socket import gethostname
 import PluginManager
 import db
+import config
 import logging
 import sys
     
@@ -46,12 +48,12 @@ class SiriFactory(Factory):
         self.numberOfConnections = 0
         self.sessionCert = None
         self.sessionCACert = None
-        self.dbConnection = None
+        self.dbConnection = None        
         
     def buildProtocol(self, addr):
         return SiriProtocolHandler(self, addr)
     
-    def startFactory(self):
+    def startFactory(self):    
         logging.getLogger().info("Loading Session Certificates")
         caFile = open("keys/SessionCACert.pem")
         self.sessionCACert = crypto.load_certificate(crypto.FILETYPE_PEM,caFile.read())
@@ -188,24 +190,30 @@ def create_self_signed_cert():
         
 def main():
     
-    parser = OptionParser()
-    parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
-    parser.add_option('-p', '--port', default=4443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
-    parser.add_option('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')
-    (options, _) = parser.parse_args()
+    parser = argparse.ArgumentParser(description='SiriServerCore\n')
+    parser.add_argument('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
+    parser.add_argument('-p', '--port', default=4443, type=int, dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
+    parser.add_argument('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')   
+    parser.add_argument('-f', '--forcelanguage', action='store_true', default=False, dest='forcelanguage', help='Force the server use language by region of device and ignore the Siri Settings language. Usefull with anyvoice cydia package. Adds functionallity for unsupported languages')
+    options = parser.parse_args()
     
     x = logging.getLogger()
-    x.setLevel(log_levels[options.logLevel])
-    
+    x.setLevel(log_levels[options.logLevel])    
     if options.logfile != None:
-        h = logging.FileHandler(options.logfile)
+        h = logging.FileHandler(options.logfile)        
     else:
-        h = logging.StreamHandler()
-    
+        h = logging.StreamHandler()  
+        
     f = logging.Formatter(u"%(levelname)s %(message)s")
     h.setFormatter(f)
     x.addHandler(h)
     
+    if options.forcelanguage != False:
+        config.forcelanguage=True
+        x.info("Forcing languages to device region and ignoring Siri Languge settings")
+    else:
+        config.forcelanguage=False
+        
     create_self_signed_cert()
     
     try: 
