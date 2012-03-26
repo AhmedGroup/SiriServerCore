@@ -11,7 +11,7 @@ from siriObjects.speechObjects import Phrase, Recognition, SpeechRecognized, \
     StartSpeechDictation, FinishSpeech, SpeechPacket
 from siriObjects.systemObjects import StartRequest, SendCommands, CancelRequest, \
     CancelSucceeded, GetSessionCertificate, GetSessionCertificateResponse, \
-    CreateSessionInfoRequest, CommandFailed
+    CreateSessionInfoRequest, CommandFailed, RollbackRequest
 from siriObjects.uiObjects import UIAddViews, UIAssistantUtteranceView, UIButton
 import PluginManager
 import flac
@@ -20,11 +20,10 @@ import pprint
 import speex
 import sqlite3
 import time
-import uuid
 import twisted
 import config
-       
-
+import uuid
+      
 class SiriProtocolHandler(Siri):
     __not_recognized =  {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry, I don't understand ‘{0}’.", "fr-FR": u"Désolé je ne comprends pas ce que \"{0}\" veut dire.", "zh-CN": u"对不起，我不知道“{0}”是什么意思。"}
     __websearch =  {"de-DE": u"Websuche", "en-US": u"Search the web", "fr-FR": u"Rechercher sur le Web", "zh-CN": u"搜索网页"}    
@@ -267,6 +266,9 @@ class SiriProtocolHandler(Siri):
                     self.current_running_plugin._abortPluginRun()     
             
             self.send_object(CancelSucceeded(cancelRequest.aceId))
+            
+        elif ObjectIsCommand(plist, RollbackRequest):
+            pass
 
         elif ObjectIsCommand(plist, GetSessionCertificate):
             getSessionCertificate = GetSessionCertificate(plist)
